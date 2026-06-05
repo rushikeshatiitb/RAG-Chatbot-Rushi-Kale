@@ -363,7 +363,11 @@ export default function App() {
                     }`}
                   >
                     <div className="flex justify-between items-start mb-xs">
-                      <span className={`text-label-sm font-label-sm px-xs py-1 rounded border ${scheme.tagColor}`}>
+                      <span className={`text-label-sm font-label-sm px-xs py-1 rounded border transition-colors ${
+                        selectedScheme.id === scheme.id
+                          ? scheme.tagColor
+                          : 'bg-outline-variant/10 text-outline/80 border-outline-variant/20'
+                      }`}>
                         {scheme.type}
                       </span>
                       <span className={`material-symbols-outlined transition-transform group-hover:scale-110 ${
