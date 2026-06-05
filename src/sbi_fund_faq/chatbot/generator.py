@@ -114,14 +114,29 @@ def generate_mock_answer(question: str, chunks: list["RetrievedChunk"]) -> str:
     scheme_name = top_chunk.metadata.get("scheme_name") or "SBI Mutual Fund Scheme"
     text = top_chunk.text.strip()
     text_lower = text.lower()
+    q_lower = question.lower()
 
-    if "exit load" in text_lower:
+    # Determine query type based on question first, fallback to text keywords
+    is_exit_load = "exit load" in q_lower or ("exit load" in text_lower and not any(k in q_lower for k in ["expense ratio", "ter", "benchmark", "lock-in", "lock in", "sip"]))
+    is_ter = "expense ratio" in q_lower or "ter" in q_lower or (("total ter" in text_lower or "expense ratio" in text_lower) and not any(k in q_lower for k in ["exit load", "benchmark", "lock-in", "lock in", "sip"]))
+    is_benchmark = "benchmark" in q_lower or ("benchmark" in text_lower and not any(k in q_lower for k in ["exit load", "expense ratio", "ter", "lock-in", "lock in", "sip"]))
+    is_sip = "sip" in q_lower or (("minimum sip" in text_lower or "sip" in text_lower) and not any(k in q_lower for k in ["exit load", "expense ratio", "ter", "benchmark", "lock-in", "lock in"]))
+    is_lockin = "lock-in" in q_lower or "lock in" in q_lower or (("lock-in" in text_lower or "lock in" in text_lower) and not any(k in q_lower for k in ["exit load", "expense ratio", "ter", "benchmark", "sip"]))
+    is_risk = "riskometer" in q_lower or "risk level" in q_lower or "risk" in q_lower or (("riskometer" in text_lower or "risk level" in text_lower or "risk" in text_lower) and not any(k in q_lower for k in ["exit load", "expense ratio", "ter", "benchmark", "sip", "lock-in", "lock in"]))
+
+    if is_exit_load:
         match = re.search(r"Exit Load:\s*(.*?)(?=\s*•|\Z)", text, re.IGNORECASE)
         details = match.group(1).strip() if match else text
         details = re.sub(r"\s+", " ", details)
+        # Handle empty/bullet load case
+        if not details or details.startswith("•") or len(details) < 3:
+            match_fallback = re.search(r"Exit Load:\s*•\s*(.*?)(?=\s*•|\Z)", text, re.IGNORECASE)
+            if match_fallback:
+                details = match_fallback.group(1).strip()
+                details = re.sub(r"\s+", " ", details)
         return f"For {scheme_name}, the Exit Load is: {details} Source: {citation}"
 
-    elif "total ter" in text_lower or "expense ratio" in text_lower:
+    elif is_ter:
         match = re.search(
             r"Regular Plan Total TER\s*([\d\.]+%?);\s*Direct Plan Total TER\s*([\d\.]+%?)",
             text,
@@ -137,19 +152,24 @@ def generate_mock_answer(question: str, chunks: list["RetrievedChunk"]) -> str:
             )
         return f"The Total Expense Ratio (TER) details for {scheme_name} are: {text} Source: {citation}"
 
-    elif "benchmark" in text_lower:
+    elif is_benchmark:
         match = re.search(r"Benchmark:\s*(.*?)(?=\s*•|\Z)", text, re.IGNORECASE)
+        if not match:
+            match = re.search(r"First Tier Benchmark:\s*(.*?)(?=\s*•|\Z)", text, re.IGNORECASE)
         details = match.group(1).strip() if match else text
         details = re.sub(r"\s+", " ", details)
         return f"The benchmark index for {scheme_name} is {details} Source: {citation}"
 
-    elif "minimum sip" in text_lower or "sip" in text_lower:
+    elif is_sip:
         return f"The minimum SIP requirements for {scheme_name} are detailed in the factsheet. Source: {citation}"
 
-    elif "lock-in" in text_lower or "lock in" in text_lower:
+    elif is_lockin:
+        match = re.search(r"(statutory lock-in of \d+ years|lock-in period of \d+ years|lock-in of \d+ years)", text, re.IGNORECASE)
+        if match:
+            return f"The lock-in period for {scheme_name} is: {match.group(1)}. Source: {citation}"
         return f"The lock-in period for {scheme_name} is specified in the factsheet. Source: {citation}"
 
-    elif "riskometer" in text_lower or "risk level" in text_lower or "risk" in text_lower:
+    elif is_risk:
         return f"The risk level/riskometer of {scheme_name} is detailed in the factsheet. Source: {citation}"
 
     # General fallback text snippet
