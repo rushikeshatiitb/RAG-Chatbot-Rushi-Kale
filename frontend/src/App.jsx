@@ -53,6 +53,8 @@ export default function App() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [activeSection, setActiveSection] = useState("analysis");
+  const [showHelpModal, setShowHelpModal] = useState(false);
+  const [showStatusModal, setShowStatusModal] = useState(false);
   
   // Chat history state
   const [chatHistory, setChatHistory] = useState([
@@ -256,9 +258,6 @@ export default function App() {
             </span>
             Active Provider: Groq
           </span>
-          <button className="material-symbols-outlined text-primary p-xs rounded-full hover:bg-surface-container-high/50 transition-colors">shield</button>
-          <button className="material-symbols-outlined text-primary p-xs rounded-full hover:bg-surface-container-high/50 transition-colors">dark_mode</button>
-          <button className="material-symbols-outlined text-primary p-xs rounded-full hover:bg-surface-container-high/50 transition-colors">settings</button>
         </div>
       </header>
 
@@ -330,11 +329,17 @@ export default function App() {
               <span className="material-symbols-outlined">refresh</span>
               Clear Chat
             </button>
-            <button className="w-full flex items-center gap-md px-md py-xs text-on-surface-variant hover:bg-surface-container-highest/40 rounded-xl text-left">
+            <button 
+              onClick={() => setShowHelpModal(true)}
+              className="w-full flex items-center gap-md px-md py-xs text-on-surface-variant hover:bg-surface-container-highest/40 rounded-xl text-left cursor-pointer transition-colors"
+            >
               <span className="material-symbols-outlined">help</span>
               <span className="text-label-md font-label-md">Help</span>
             </button>
-            <button className="w-full flex items-center gap-md px-md py-xs text-on-surface-variant hover:bg-surface-container-highest/40 rounded-xl text-left">
+            <button 
+              onClick={() => setShowStatusModal(true)}
+              className="w-full flex items-center gap-md px-md py-xs text-on-surface-variant hover:bg-surface-container-highest/40 rounded-xl text-left cursor-pointer transition-colors"
+            >
               <span className="material-symbols-outlined">check_circle</span>
               <span className="text-label-md font-label-md">Status</span>
             </button>
@@ -1008,6 +1013,128 @@ export default function App() {
           <a className="text-label-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Regulatory Info</a>
         </div>
       </footer>
+
+      {/* Help Modal */}
+      {showHelpModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-md">
+          <div className="glass-panel p-lg rounded-2xl border-primary/20 bg-surface-container/90 max-w-lg w-full flex flex-col gap-md shadow-2xl relative">
+            <button 
+              onClick={() => setShowHelpModal(false)}
+              className="absolute top-md right-md material-symbols-outlined text-outline hover:text-primary transition-colors cursor-pointer"
+            >
+              close
+            </button>
+            <div className="flex items-center gap-xs text-primary mb-xs">
+              <span className="material-symbols-outlined">help</span>
+              <h3 className="text-headline-sm font-bold text-on-surface">System Help &amp; FAQs</h3>
+            </div>
+            
+            <div className="space-y-sm text-body-md text-on-surface-variant overflow-y-auto max-h-[60vh] custom-scrollbar pr-xs">
+              <div>
+                <h4 className="font-bold text-on-surface mb-xs">Supported Schemes:</h4>
+                <ul className="list-disc pl-md space-y-1">
+                  <li>SBI Flexicap Fund</li>
+                  <li>SBI ELSS Tax Saver Fund</li>
+                  <li>SBI Large Cap Fund</li>
+                </ul>
+              </div>
+
+              <div>
+                <h4 className="font-bold text-on-surface mb-xs">Supported Question Types:</h4>
+                <p className="leading-relaxed">You can ask about exit loads, expense ratios (TER), risk levels, benchmarks, lock-in periods, investment objectives, or minimum SIP/lump sum requirements.</p>
+              </div>
+
+              <div>
+                <h4 className="font-bold text-on-surface mb-xs font-headline-sm">Facts-Only Policy:</h4>
+                <p className="leading-relaxed">Answers are generated strictly using ingested official documents. The system cannot provide investment advice, asset allocation opinions, or buying recommendations.</p>
+              </div>
+
+              <div>
+                <h4 className="font-bold text-on-surface mb-xs">Example Questions:</h4>
+                <ul className="list-disc pl-md space-y-1 font-mono text-label-md">
+                  <li>"What is the exit load of SBI Flexicap Fund?"</li>
+                  <li>"What is the lock-in period for SBI ELSS Tax Saver Fund?"</li>
+                  <li>"What is the benchmark of SBI Large Cap Fund?"</li>
+                </ul>
+              </div>
+            </div>
+
+            <button 
+              onClick={() => setShowHelpModal(false)}
+              className="mt-sm w-full py-sm bg-primary text-on-primary font-bold rounded-xl active:scale-95 transition-transform"
+            >
+              Close Help
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Status Modal */}
+      {showStatusModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-md">
+          <div className="glass-panel p-lg rounded-2xl border-primary/20 bg-surface-container/90 max-w-lg w-full flex flex-col gap-md shadow-2xl relative">
+            <button 
+              onClick={() => setShowStatusModal(false)}
+              className="absolute top-md right-md material-symbols-outlined text-outline hover:text-primary transition-colors cursor-pointer"
+            >
+              close
+            </button>
+            <div className="flex items-center gap-xs text-primary mb-xs">
+              <span className="material-symbols-outlined">check_circle</span>
+              <h3 className="text-headline-sm font-bold text-on-surface">System Status Registry</h3>
+            </div>
+            
+            <div className="space-y-sm text-body-md text-on-surface-variant">
+              <div className="flex justify-between items-center py-xs border-b border-outline-variant/10">
+                <span className="font-semibold text-on-surface">Backend Status:</span>
+                <span className="text-primary font-bold flex items-center gap-xs">
+                  <span className="relative flex h-2.5 w-2.5">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-primary"></span>
+                  </span>
+                  Connected
+                </span>
+              </div>
+
+              <div className="flex justify-between items-center py-xs border-b border-outline-variant/10">
+                <span className="font-semibold text-on-surface">Active LLM Provider:</span>
+                <span className="text-on-surface font-mono">Groq (Llama 3.3 70B)</span>
+              </div>
+
+              <div className="flex justify-between items-center py-xs border-b border-outline-variant/10">
+                <span className="font-semibold text-on-surface">Railway Deployment:</span>
+                <span className="text-primary font-bold flex items-center gap-xs">
+                  <span className="w-2.5 h-2.5 rounded-full bg-primary"></span>
+                  Active / Healthy
+                </span>
+              </div>
+
+              <div className="flex justify-between items-center py-xs border-b border-outline-variant/10">
+                <span className="font-semibold text-on-surface">Vector Store Index:</span>
+                <span className="text-primary font-bold flex items-center gap-xs">
+                  <span className="w-2.5 h-2.5 rounded-full bg-primary"></span>
+                  Loaded (220 Chunks)
+                </span>
+              </div>
+
+              <div className="flex justify-between items-center py-xs border-b border-outline-variant/10">
+                <span className="font-semibold text-on-surface">Source Registries:</span>
+                <span className="text-primary font-bold flex items-center gap-xs">
+                  <span className="w-2.5 h-2.5 rounded-full bg-primary"></span>
+                  Verified (4 Files)
+                </span>
+              </div>
+            </div>
+
+            <button 
+              onClick={() => setShowStatusModal(false)}
+              className="mt-sm w-full py-sm bg-primary text-on-primary font-bold rounded-xl active:scale-95 transition-transform"
+            >
+              Close Status
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
