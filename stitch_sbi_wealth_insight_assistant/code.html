@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SBI Mutual Fund FAQ Assistant</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(100, 116, 139, 0.2);
+        }
+        .jade-glow {
+            box-shadow: 0 0 40px -10px rgba(78, 222, 163, 0.1);
+        }
+        .jade-glow-strong {
+            box-shadow: 0 0 20px -5px rgba(78, 222, 163, 0.3);
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(134, 148, 138, 0.2);
+            border-radius: 10px;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "background": "#0e1511",
+                      "on-secondary-container": "#afb6bd",
+                      "secondary": "#c1c7cf",
+                      "surface-container-lowest": "#09100c",
+                      "on-background": "#dde4dd",
+                      "tertiary-fixed": "#d3e4fe",
+                      "error": "#ffb4ab",
+                      "outline": "#86948a",
+                      "on-tertiary-fixed-variant": "#38485d",
+                      "on-primary-fixed-variant": "#005236",
+                      "on-tertiary-container": "#2a3a4f",
+                      "on-secondary-fixed-variant": "#41474e",
+                      "inverse-surface": "#dde4dd",
+                      "outline-variant": "#3c4a42",
+                      "on-primary": "#003824",
+                      "on-secondary": "#2b3137",
+                      "on-surface": "#dde4dd",
+                      "surface-container-highest": "#2f3632",
+                      "on-tertiary": "#213145",
+                      "secondary-fixed": "#dde3eb",
+                      "surface-container-high": "#242c27",
+                      "surface-container-low": "#161d19",
+                      "surface": "#0e1511",
+                      "primary": "#4edea3",
+                      "on-primary-fixed": "#002113",
+                      "on-error-container": "#ffdad6",
+                      "secondary-fixed-dim": "#c1c7cf",
+                      "error-container": "#93000a",
+                      "surface-variant": "#2f3632",
+                      "surface-dim": "#0e1511",
+                      "on-secondary-fixed": "#161c22",
+                      "primary-container": "#10b981",
+                      "surface-bright": "#343b36",
+                      "secondary-container": "#41474e",
+                      "inverse-on-surface": "#2b322d",
+                      "on-tertiary-fixed": "#0b1c30",
+                      "inverse-primary": "#006c49",
+                      "tertiary": "#b7c8e1",
+                      "tertiary-container": "#94a4bd",
+                      "tertiary-fixed-dim": "#b7c8e1",
+                      "on-surface-variant": "#bbcabf",
+                      "surface-tint": "#4edea3",
+                      "surface-container": "#1a211d",
+                      "on-primary-container": "#00422b",
+                      "primary-fixed": "#6ffbbe",
+                      "on-error": "#690005",
+                      "primary-fixed-dim": "#4edea3"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "xl": "64px",
+                      "gutter": "24px",
+                      "base": "4px",
+                      "sm": "16px",
+                      "md": "24px",
+                      "xs": "8px",
+                      "lg": "40px",
+                      "container-max": "1200px"
+              },
+              "fontFamily": {
+                      "label-sm": ["Inter"],
+                      "body-md": ["Inter"],
+                      "body-lg": ["Inter"],
+                      "headline-lg-mobile": ["Outfit"],
+                      "display-lg": ["Outfit"],
+                      "label-md": ["Inter"],
+                      "headline-md": ["Outfit"],
+                      "headline-lg": ["Outfit"]
+              },
+              "fontSize": {
+                      "label-sm": ["12px", {"lineHeight": "1.2", "fontWeight": "600"}],
+                      "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                      "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                      "headline-lg-mobile": ["24px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                      "display-lg": ["48px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                      "label-md": ["14px", {"lineHeight": "1.4", "letterSpacing": "0.01em", "fontWeight": "500"}],
+                      "headline-md": ["24px", {"lineHeight": "1.4", "fontWeight": "500"}],
+                      "headline-lg": ["32px", {"lineHeight": "1.3", "fontWeight": "600"}]
+              }
+            },
+          },
+        }
+      </script>
+</head>
+<body class="bg-background text-on-surface selection:bg-primary/30 min-h-screen font-body-md overflow-hidden">
+<!-- TopAppBar -->
+<header class="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-md h-xl bg-surface/80 backdrop-blur-xl border-b border-outline-variant/20">
+<div class="flex items-center gap-sm">
+<span class="text-headline-md font-headline-md font-bold text-primary">SBI Mutual Fund FAQ Assistant</span>
+</div>
+<div class="flex items-center gap-md">
+<button class="material-symbols-outlined text-primary p-xs rounded-full hover:bg-surface-container-high/50 transition-colors">shield</button>
+<button class="material-symbols-outlined text-primary p-xs rounded-full hover:bg-surface-container-high/50 transition-colors">dark_mode</button>
+<button class="material-symbols-outlined text-primary p-xs rounded-full hover:bg-surface-container-high/50 transition-colors">settings</button>
+</div>
+</header>
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-xl bottom-0 w-[280px] z-40 flex flex-col p-xs bg-surface-container-low/60 backdrop-blur-xl border-r border-outline-variant/20">
+<div class="px-sm py-md mb-xs">
+<div class="flex items-center gap-xs">
+<div class="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">account_balance</span>
+</div>
+<div>
+<div class="text-headline-sm font-headline-sm font-bold text-on-surface">Wealth-Tech AI</div>
+<div class="text-label-md font-label-md text-on-surface-variant">Factual RAG Assistant</div>
+</div>
+</div>
+</div>
+<nav class="flex-1 space-y-1">
+<!-- Active Item: Scheme Analysis (matches context of dashboard) -->
+<button class="w-full flex items-center gap-md px-md py-xs text-on-surface-variant hover:bg-surface-container-highest/40 rounded-xl transition-all">
+<span class="material-symbols-outlined">database</span>
+<span class="text-label-md font-label-md">Knowledge Base</span>
+</button>
+<button class="w-full flex items-center gap-md px-md py-xs text-on-surface-variant hover:bg-surface-container-highest/40 rounded-xl transition-all">
+<span class="material-symbols-outlined">list_alt</span>
+<span class="text-label-md font-label-md">Query Templates</span>
+</button>
+<button class="w-full flex items-center gap-md px-md py-xs bg-primary-container text-on-primary-container rounded-xl mx-2 my-1 scale-98 transition-all">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">analytics</span>
+<span class="text-label-md font-label-md">Scheme Analysis</span>
+</button>
+<button class="w-full flex items-center gap-md px-md py-xs text-on-surface-variant hover:bg-surface-container-highest/40 rounded-xl transition-all">
+<span class="material-symbols-outlined">verified_user</span>
+<span class="text-label-md font-label-md">Safety Logs</span>
+</button>
+</nav>
+<div class="mt-auto px-xs space-y-1">
+<button class="w-full mb-md py-sm bg-primary text-on-primary font-bold rounded-xl flex items-center justify-center gap-xs active:scale-95 transition-transform">
+<span class="material-symbols-outlined">add</span>
+                New Analysis
+            </button>
+<button class="w-full flex items-center gap-md px-md py-xs text-on-surface-variant hover:bg-surface-container-highest/40 rounded-xl">
+<span class="material-symbols-outlined">help</span>
+<span class="text-label-md font-label-md">Help</span>
+</button>
+<button class="w-full flex items-center gap-md px-md py-xs text-on-surface-variant hover:bg-surface-container-highest/40 rounded-xl">
+<span class="material-symbols-outlined">check_circle</span>
+<span class="text-label-md font-label-md">Status</span>
+</button>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="ml-[280px] pt-xl pb-xl h-screen flex gap-gutter p-md overflow-hidden">
+<!-- Left Column (40%) -->
+<section class="w-[40%] flex flex-col gap-md h-full">
+<div class="flex-none">
+<h2 class="text-headline-md font-headline-md text-on-surface mb-xs">Supported Schemes</h2>
+<p class="text-on-surface-variant text-label-md">Select a fund to contextualize your queries.</p>
+</div>
+<!-- Fund Cards Container -->
+<div class="flex-1 flex flex-col gap-sm overflow-y-auto custom-scrollbar pr-xs">
+<!-- SBI Flexicap Fund -->
+<div class="glass-panel p-md rounded-xl group relative overflow-hidden transition-all hover:border-primary/40 cursor-pointer">
+<div class="flex justify-between items-start mb-xs">
+<span class="text-label-sm font-label-sm px-xs py-1 rounded bg-primary/10 text-primary border border-primary/20">EQUITY</span>
+<span class="material-symbols-outlined text-primary group-hover:scale-110 transition-transform">trending_up</span>
+</div>
+<h3 class="text-body-lg font-bold text-on-surface">SBI Flexicap Fund</h3>
+<p class="text-label-md text-on-surface-variant">Diversified portfolio across market caps.</p>
+<!-- Hover Reveal Stats -->
+<div class="mt-md pt-md border-t border-outline-variant/20 flex justify-between items-center opacity-0 group-hover:opacity-100 transition-opacity translate-y-2 group-hover:translate-y-0 duration-300">
+<div class="text-center">
+<div class="text-label-sm text-on-surface-variant">Asset Class</div>
+<div class="text-label-md font-bold text-primary">Equity</div>
+</div>
+<div class="text-center">
+<div class="text-label-sm text-on-surface-variant">Launch Date</div>
+<div class="text-label-md font-bold text-primary">Sep 2005</div>
+</div>
+<div class="text-center">
+<div class="text-label-sm text-on-surface-variant">AUM</div>
+<div class="text-label-md font-bold text-primary">₹20.4K Cr</div>
+</div>
+</div>
+</div>
+<!-- SBI ELSS Tax Saver Fund -->
+<div class="glass-panel p-md rounded-xl group relative overflow-hidden transition-all hover:border-primary/40 cursor-pointer">
+<div class="flex justify-between items-start mb-xs">
+<span class="text-label-sm font-label-sm px-xs py-1 rounded bg-tertiary/10 text-tertiary border border-tertiary/20">ELSS</span>
+<span class="material-symbols-outlined text-tertiary group-hover:scale-110 transition-transform">account_balance_wallet</span>
+</div>
+<h3 class="text-body-lg font-bold text-on-surface">SBI ELSS Tax Saver Fund</h3>
+<p class="text-label-md text-on-surface-variant">80C Tax benefits with equity returns.</p>
+<!-- Hover Reveal Stats -->
+<div class="mt-md pt-md border-t border-outline-variant/20 flex justify-between items-center opacity-0 group-hover:opacity-100 transition-opacity translate-y-2 group-hover:translate-y-0 duration-300">
+<div class="text-center">
+<div class="text-label-sm text-on-surface-variant">Asset Class</div>
+<div class="text-label-md font-bold text-primary">Equity</div>
+</div>
+<div class="text-center">
+<div class="text-label-sm text-on-surface-variant">Launch Date</div>
+<div class="text-label-md font-bold text-primary">Mar 1993</div>
+</div>
+<div class="text-center">
+<div class="text-label-sm text-on-surface-variant">AUM</div>
+<div class="text-label-md font-bold text-primary">₹18.2K Cr</div>
+</div>
+</div>
+</div>
+<!-- SBI Large Cap Fund -->
+<div class="glass-panel p-md rounded-xl group relative overflow-hidden transition-all hover:border-primary/40 cursor-pointer">
+<div class="flex justify-between items-start mb-xs">
+<span class="text-label-sm font-label-sm px-xs py-1 rounded bg-secondary/10 text-secondary border border-secondary/20">LARGE CAP</span>
+<span class="material-symbols-outlined text-secondary group-hover:scale-110 transition-transform">stat_3</span>
+</div>
+<h3 class="text-body-lg font-bold text-on-surface">SBI Large Cap Fund</h3>
+<p class="text-label-md text-on-surface-variant">Stable growth through blue-chip stocks.</p>
+<!-- Hover Reveal Stats -->
+<div class="mt-md pt-md border-t border-outline-variant/20 flex justify-between items-center opacity-0 group-hover:opacity-100 transition-opacity translate-y-2 group-hover:translate-y-0 duration-300">
+<div class="text-center">
+<div class="text-label-sm text-on-surface-variant">Asset Class</div>
+<div class="text-label-md font-bold text-primary">Equity</div>
+</div>
+<div class="text-center">
+<div class="text-label-sm text-on-surface-variant">Launch Date</div>
+<div class="text-label-md font-bold text-primary">May 1987</div>
+</div>
+<div class="text-center">
+<div class="text-label-sm text-on-surface-variant">AUM</div>
+<div class="text-label-md font-bold text-primary">₹34.1K Cr</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Quick-Query Templates -->
+<div class="flex-none pt-md">
+<h3 class="text-label-md font-bold text-on-surface mb-sm">Quick-Query Templates</h3>
+<div class="flex flex-wrap gap-xs">
+<button class="px-md py-xs glass-panel rounded-full text-label-md text-on-surface-variant hover:text-primary hover:border-primary/50 transition-colors">Expense Ratio</button>
+<button class="px-md py-xs glass-panel rounded-full text-label-md text-on-surface-variant hover:text-primary hover:border-primary/50 transition-colors">Exit Load</button>
+<button class="px-md py-xs glass-panel rounded-full text-label-md text-on-surface-variant hover:text-primary hover:border-primary/50 transition-colors">Riskometer</button>
+<button class="px-md py-xs glass-panel rounded-full text-label-md text-on-surface-variant hover:text-primary hover:border-primary/50 transition-colors">Historical NAV</button>
+<button class="px-md py-xs glass-panel rounded-full text-label-md text-on-surface-variant hover:text-primary hover:border-primary/50 transition-colors">Taxation</button>
+</div>
+</div>
+</section>
+<!-- Right Column (60%) -->
+<section class="w-[60%] flex flex-col gap-md h-full relative">
+<!-- Floating Query Input -->
+<div class="glass-panel p-sm rounded-2xl jade-glow-strong border-primary/20 flex items-center gap-md">
+<div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-none">
+<span class="material-symbols-outlined text-primary">psychology</span>
+</div>
+<input class="bg-transparent border-none outline-none focus:ring-0 text-body-lg text-on-surface w-full placeholder:text-outline/50" placeholder="What are the risk factors for SBI Flexicap Fund?" type="text"/>
+<button class="bg-primary text-on-primary w-12 h-12 rounded-xl flex items-center justify-center shadow-lg active:scale-95 transition-transform flex-none">
+<span class="material-symbols-outlined">arrow_forward</span>
+</button>
+</div>
+<!-- Chat / Results Canvas -->
+<div class="flex-1 flex flex-col gap-md overflow-y-auto custom-scrollbar pr-xs">
+<!-- User Question Placeholder -->
+<div class="flex justify-end">
+<div class="max-w-[80%] glass-panel px-md py-sm rounded-2xl rounded-tr-none text-on-surface border-primary/10">
+<p class="text-body-md">Tell me about the specific risk factors for SBI Flexicap Fund as per the latest April 2026 factsheet.</p>
+</div>
+</div>
+<!-- AI Response Card -->
+<div class="glass-panel p-lg rounded-2xl relative">
+<div class="flex items-center gap-xs mb-md">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">verified</span>
+<span class="text-label-sm font-bold text-primary tracking-widest uppercase">Factual Answer</span>
+<span class="mx-xs h-3 w-[1px] bg-outline-variant/30"></span>
+<span class="text-label-sm bg-surface-container-high px-xs py-1 rounded text-on-surface-variant">Source: SBI Flexicap Fund Factsheet, April 2026</span>
+</div>
+<div class="space-y-md">
+<p class="text-body-lg leading-relaxed text-on-surface">
+                            The <span class="text-primary font-bold">SBI Flexicap Fund</span> carries a "Very High" risk according to its latest riskometer. The primary risk factors highlighted in the April 2026 disclosure include:
+                        </p>
+<ul class="space-y-sm">
+<li class="flex gap-md">
+<span class="material-symbols-outlined text-primary text-body-md">check_circle</span>
+<span class="text-body-md text-on-surface-variant"><strong class="text-on-surface">Market Risk:</strong> Potential loss due to fluctuations in equity prices across small, mid, and large cap segments.</span>
+</li>
+<li class="flex gap-md">
+<span class="material-symbols-outlined text-primary text-body-md">check_circle</span>
+<span class="material-symbols-outlined text-primary text-body-md"></span>
+<span class="text-body-md text-on-surface-variant"><strong class="text-on-surface">Concentration Risk:</strong> Higher volatility if the fund manager shifts weight toward specific high-conviction sectors like Banking or Energy.</span>
+</li>
+<li class="flex gap-md">
+<span class="material-symbols-outlined text-primary text-body-md">check_circle</span>
+<span class="text-body-md text-on-surface-variant"><strong class="text-on-surface">Liquidity Risk:</strong> Limited volume in certain mid and small-cap stocks may affect timely redemption at favorable prices.</span>
+</li>
+</ul>
+</div>
+<!-- Grounding & Reference Chunks Drawer -->
+<div class="mt-lg pt-lg border-t border-outline-variant/20">
+<div class="flex items-center justify-between mb-md">
+<h4 class="text-label-md font-bold flex items-center gap-xs">
+<span class="material-symbols-outlined text-sm">attachment</span>
+                                Grounding &amp; Reference Chunks
+                            </h4>
+<span class="text-label-sm text-outline">Showing 1 of 4 matches</span>
+</div>
+<div class="glass-panel bg-surface-container-low/40 p-md rounded-xl border-primary/10">
+<div class="flex items-center gap-md mb-sm">
+<!-- Circular match score -->
+<div class="relative w-12 h-12 flex-none">
+<svg class="w-full h-full -rotate-90">
+<circle class="text-outline-variant/20" cx="24" cy="24" fill="transparent" r="20" stroke="currentColor" stroke-width="4"></circle>
+<circle class="text-primary" cx="24" cy="24" fill="transparent" r="20" stroke="currentColor" stroke-dasharray="125.6" stroke-dashoffset="12.5" stroke-width="4"></circle>
+</svg>
+<div class="absolute inset-0 flex items-center justify-center text-label-sm font-bold text-primary">92%</div>
+</div>
+<div class="flex-1">
+<div class="text-label-sm font-bold text-on-surface">SBI_Flexicap_April_2026.pdf</div>
+<div class="text-label-sm text-on-surface-variant">Page 2, Section: Risk Factors and Performance Metrics</div>
+</div>
+<button class="material-symbols-outlined text-outline hover:text-on-surface transition-colors">open_in_new</button>
+</div>
+<p class="text-label-md italic text-on-surface-variant border-l-2 border-primary pl-md py-xs">
+                                "...the scheme may be prone to <mark class="bg-primary/20 text-primary px-1 rounded">Concentration Risk</mark> should the allocation to a specific sector exceed 25% of the NAV. Investors should be aware that the <mark class="bg-primary/20 text-primary px-1 rounded">flexi-cap nature</mark> allows significant reallocation between tiers, leading to dynamic risk profiles..."
+                            </p>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer / Disclaimer -->
+<footer class="fixed bottom-0 left-0 w-full z-50 flex flex-col justify-center items-center bg-surface-container-lowest/90 backdrop-blur-md border-t border-outline-variant/20 py-xs px-md">
+<div class="flex gap-md mb-1">
+<span class="text-label-sm text-on-surface-variant">© 2024 SBI Mutual Fund. Factual RAG Assistant • Facts-Only Mode Active.</span>
+</div>
+<div class="flex gap-md">
+<a class="text-label-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Legal Disclaimer</a>
+<span class="text-outline-variant/30">•</span>
+<a class="text-label-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Privacy Policy</a>
+<span class="text-outline-variant/30">•</span>
+<a class="text-label-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Regulatory Info</a>
+</div>
+</footer>
+<script>
+        // Simple micro-interaction for cards
+        document.querySelectorAll('.glass-panel').forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                card.style.transform = 'translateY(-4px)';
+            });
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'translateY(0)';
+            });
+        });
+
+        // Search focus interaction
+        const queryInput = document.querySelector('input[type="text"]');
+        const searchContainer = queryInput.closest('.glass-panel');
+        
+        queryInput.addEventListener('focus', () => {
+            searchContainer.classList.add('border-primary');
+            searchContainer.classList.remove('border-primary/20');
+        });
+        
+        queryInput.addEventListener('blur', () => {
+            searchContainer.classList.remove('border-primary');
+            searchContainer.classList.add('border-primary/20');
+        });
+    </script>
+</body></html>

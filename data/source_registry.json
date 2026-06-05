@@ -1,0 +1,48 @@
+{
+  "approved_sources": [
+    {
+      "id": "sbi-flexicap-fund-factsheet-april-2026",
+      "source_name": "SBI Flexicap Fund Factsheet",
+      "file_name": "sbi-flexicap-fund-factsheet-april-2026.pdf",
+      "document_type": "Factsheet",
+      "document_month": "April 2026",
+      "scheme_names": ["SBI Flexicap Fund"],
+      "file_type": "pdf",
+      "sha256": "033f97f7872c9765a9cbd80dd20581dff1ad8d66ab4e10564b0136748069d380"
+    },
+    {
+      "id": "sbi-elss-tax-saver-fund-factsheet-april-2026",
+      "source_name": "SBI ELSS Tax Saver Fund Factsheet",
+      "file_name": "sbi-elss-tax-saver-fund-factsheet-april-2026.pdf",
+      "document_type": "Factsheet",
+      "document_month": "April 2026",
+      "scheme_names": ["SBI ELSS Tax Saver Fund"],
+      "file_type": "pdf",
+      "sha256": "fe2125bfbd69071f503d9b1434cd3f420aa5996a2b9df2f32aef94d39f9a80c3"
+    },
+    {
+      "id": "sbi-large-cap-fund-factsheet-april-2026",
+      "source_name": "SBI Large Cap Fund Factsheet",
+      "file_name": "sbi-large-cap-fund-factsheet-april-2026.pdf",
+      "document_type": "Factsheet",
+      "document_month": "April 2026",
+      "scheme_names": ["SBI Large Cap Fund"],
+      "file_type": "pdf",
+      "sha256": "12178b0940bdb20d12f5313399d70a6c153c3bd465c85ebf657be08d7ba2f427"
+    },
+    {
+      "id": "sbi-total-expense-ratio-ter-data-file",
+      "source_name": "SBI Total Expense Ratio (TER) Data File",
+      "file_name": "sbi-total-expense-ratio-ter-data-file.xlsx",
+      "document_type": "TER Data File",
+      "document_month": "Current Year",
+      "scheme_names": [
+        "SBI Flexicap Fund",
+        "SBI ELSS Tax Saver Fund",
+        "SBI Large Cap Fund"
+      ],
+      "file_type": "xlsx",
+      "sha256": "e5d48e40285105c70ec305081b62e479049157d3a37d7cf1621a39007fa72941"
+    }
+  ]
+}
