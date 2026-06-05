@@ -33,3 +33,12 @@
     background: rgba(134, 148, 138, 0.2);
     border-radius: 10px;
 }
+
+details summary::-webkit-details-marker {
+    display: none;
+}
+
+details summary {
+    list-style: none;
+}
+

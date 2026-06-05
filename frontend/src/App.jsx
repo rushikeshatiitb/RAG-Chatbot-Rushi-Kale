@@ -500,16 +500,21 @@ export default function App() {
 
                       {/* Retrieved Grounding Chunks Accordion */}
                       {!msg.is_advice && !msg.is_ambiguous && msg.chunks && msg.chunks.length > 0 && (
-                        <div className="mt-lg pt-lg border-t border-outline-variant/20">
-                          <div className="flex items-center justify-between mb-md">
-                            <h4 className="text-label-md font-bold flex items-center gap-xs">
-                              <span className="material-symbols-outlined text-sm">attachment</span>
-                              Grounding &amp; Reference Chunks
-                            </h4>
+                        <details className="group mt-lg pt-lg border-t border-outline-variant/20">
+                          <summary className="flex items-center justify-between cursor-pointer list-none select-none">
+                            <div className="flex items-center gap-xs">
+                              <span className="material-symbols-outlined text-primary transition-transform duration-200 group-open:rotate-180">
+                                expand_more
+                              </span>
+                              <h4 className="text-label-md font-bold flex items-center gap-xs">
+                                <span className="material-symbols-outlined text-sm">attachment</span>
+                                Grounding &amp; Reference Chunks
+                              </h4>
+                            </div>
                             <span className="text-label-sm text-outline">Showing {msg.chunks.length} matching sources</span>
-                          </div>
+                          </summary>
                           
-                          <div className="space-y-sm">
+                          <div className="space-y-sm mt-md">
                             {msg.chunks.map((chunk, cIdx) => (
                               <div key={chunk.id || cIdx} className="glass-panel bg-surface-container-low/40 p-md rounded-xl border-primary/10">
                                 <div className="flex items-center gap-md mb-sm">
@@ -552,7 +557,7 @@ export default function App() {
                               </div>
                             ))}
                           </div>
-                        </div>
+                        </details>
                       )}
                     </div>
                   )}
