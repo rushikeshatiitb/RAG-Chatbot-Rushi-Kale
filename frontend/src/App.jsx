@@ -449,7 +449,7 @@ export default function App() {
                   <div
                     key={scheme.id}
                     onClick={() => setSelectedScheme(scheme)}
-                    className={`glass-panel p-sm sm:p-md rounded-xl group relative overflow-hidden cursor-pointer transition-all border ${
+                    className={`glass-panel p-sm sm:p-md rounded-xl group relative overflow-hidden cursor-pointer transition-all border flex-none ${
                       selectedScheme.id === scheme.id ? 'border-primary bg-primary/5 jade-glow' : 'border-outline-variant/20 hover:border-primary/40'
                     }`}
                   >
