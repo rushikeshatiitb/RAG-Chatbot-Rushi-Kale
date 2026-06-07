@@ -2,6 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
+html, body, #root {
+    overflow-x: hidden;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+}
+
 .glass-panel {
     background: rgba(255, 255, 255, 0.05);
     backdrop-filter: blur(16px);

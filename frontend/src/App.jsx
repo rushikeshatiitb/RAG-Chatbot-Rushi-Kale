@@ -55,7 +55,22 @@ export default function App() {
   const [activeSection, setActiveSection] = useState("analysis");
   const [showHelpModal, setShowHelpModal] = useState(false);
   const [showStatusModal, setShowStatusModal] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(true);
   
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 1280) {
+        setIsSidebarCollapsed(false);
+      } else {
+        setIsSidebarCollapsed(true);
+      }
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   // Chat history state
   const [chatHistory, setChatHistory] = useState([
     {
@@ -243,12 +258,30 @@ export default function App() {
   };
 
   return (
-    <div className="flex flex-col h-screen text-on-surface bg-background overflow-hidden font-body-md select-none">
+    <div className="flex flex-col md:h-screen md:overflow-hidden min-h-screen overflow-y-auto text-on-surface bg-background font-body-md select-none">
       
+      {/* Drawer Backdrop overlay on Mobile */}
+      {isMobileMenuOpen && (
+        <div 
+          className="fixed inset-0 z-[90] bg-black/60 backdrop-blur-xs md:hidden"
+          onClick={() => setIsMobileMenuOpen(false)}
+        />
+      )}
+
       {/* Top Header */}
-      <header className="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-md h-xl bg-surface/80 backdrop-blur-xl border-b border-outline-variant/20">
+      <header className="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-sm sm:px-md h-xl bg-surface/80 backdrop-blur-xl border-b border-outline-variant/20">
         <div className="flex items-center gap-sm">
-          <span className="text-headline-md font-headline-md font-bold text-primary">SBI Mutual Fund FAQ Assistant</span>
+          {/* Mobile hamburger menu button */}
+          <button
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            className="flex md:hidden items-center justify-center w-10 h-10 rounded-lg hover:bg-surface-container-highest/40 text-on-surface-variant hover:text-primary transition-colors mr-xs"
+            aria-label="Toggle Navigation Menu"
+          >
+            <span className="material-symbols-outlined">menu</span>
+          </button>
+          <span className="text-lg sm:text-headline-md font-bold text-primary truncate max-w-[200px] xs:max-w-[280px] sm:max-w-none">
+            SBI Mutual Fund FAQ Assistant
+          </span>
         </div>
         <div className="flex items-center gap-md">
           <span className="hidden sm:inline-flex items-center gap-xs px-xs py-1 rounded bg-primary/10 text-primary border border-primary/20 text-label-sm">
@@ -261,109 +294,162 @@ export default function App() {
         </div>
       </header>
 
-      <div className="flex flex-1 pt-xl pb-xl h-full overflow-hidden">
+      <div className="flex flex-col md:flex-row flex-1 pt-xl pb-0 md:pb-xl h-auto md:h-full md:overflow-hidden">
         
         {/* Left Side Navigation */}
-        <aside className="hidden md:flex w-[260px] flex-col p-xs bg-surface-container-low/60 backdrop-blur-xl border-r border-outline-variant/20">
-          <div className="px-sm py-md mb-xs">
-            <div className="flex items-center gap-xs">
-              <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center">
+        <aside className={`fixed inset-y-0 left-0 z-[100] md:relative md:translate-x-0 flex flex-col p-xs bg-surface-container-low/95 md:bg-surface-container-low/60 backdrop-blur-xl border-r border-outline-variant/20 shadow-2xl md:shadow-none transition-all duration-300 ${
+          isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"
+        } ${
+          isSidebarCollapsed ? "md:w-[72px]" : "md:w-[260px]"
+        }`}>
+          <div className="px-sm py-md mb-xs flex items-center justify-between">
+            <div className="flex items-center gap-xs overflow-hidden">
+              <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center flex-none">
                 <span className="material-symbols-outlined text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>account_balance</span>
               </div>
-              <div>
-                <div className="text-headline-sm font-headline-sm font-bold text-on-surface">Lumina Finance</div>
-                <div className="text-label-md font-label-md text-on-surface-variant">Factual RAG Assistant</div>
-              </div>
+              {!isSidebarCollapsed && (
+                <div className="transition-opacity duration-300 opacity-100 whitespace-nowrap">
+                  <div className="text-headline-sm font-headline-sm font-bold text-on-surface">Lumina Finance</div>
+                  <div className="text-label-md font-label-md text-on-surface-variant">Factual RAG Assistant</div>
+                </div>
+              )}
             </div>
+            {/* Collapse toggle button for tablet/desktop */}
+            <button 
+              onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+              className="hidden md:flex items-center justify-center w-8 h-8 rounded-lg hover:bg-surface-container-highest/40 text-on-surface-variant hover:text-primary transition-colors flex-none"
+              title={isSidebarCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
+            >
+              <span className="material-symbols-outlined text-md">
+                {isSidebarCollapsed ? "chevron_right" : "menu_open"}
+              </span>
+            </button>
           </div>
           
           <nav className="flex-1 space-y-1">
             <button
-              onClick={() => setActiveSection("knowledge")}
+              onClick={() => {
+                setActiveSection("knowledge");
+                setIsMobileMenuOpen(false);
+              }}
               className={`w-full flex items-center gap-md px-md py-xs transition-all text-left rounded-xl ${
                 activeSection === "knowledge"
                   ? "bg-primary-container text-on-primary-container scale-98"
                   : "text-on-surface-variant hover:bg-surface-container-highest/40"
-              }`}
+              } ${isSidebarCollapsed ? "justify-center px-0" : ""}`}
+              title="Knowledge Base"
             >
               <span className="material-symbols-outlined" style={activeSection === "knowledge" ? { fontVariationSettings: "'FILL' 1" } : {}}>database</span>
-              <span className="text-label-md font-label-md">Knowledge Base</span>
+              {!isSidebarCollapsed && <span className="text-label-md font-label-md">Knowledge Base</span>}
             </button>
             <button
-              onClick={() => setActiveSection("templates")}
+              onClick={() => {
+                setActiveSection("templates");
+                setIsMobileMenuOpen(false);
+              }}
               className={`w-full flex items-center gap-md px-md py-xs transition-all text-left rounded-xl ${
                 activeSection === "templates"
                   ? "bg-primary-container text-on-primary-container scale-98"
                   : "text-on-surface-variant hover:bg-surface-container-highest/40"
-              }`}
+              } ${isSidebarCollapsed ? "justify-center px-0" : ""}`}
+              title="Query Templates"
             >
               <span className="material-symbols-outlined" style={activeSection === "templates" ? { fontVariationSettings: "'FILL' 1" } : {}}>list_alt</span>
-              <span className="text-label-md font-label-md">Query Templates</span>
+              {!isSidebarCollapsed && <span className="text-label-md font-label-md">Query Templates</span>}
             </button>
             <button
-              onClick={() => setActiveSection("analysis")}
+              onClick={() => {
+                setActiveSection("analysis");
+                setIsMobileMenuOpen(false);
+              }}
               className={`w-full flex items-center gap-md px-md py-xs transition-all text-left rounded-xl ${
                 activeSection === "analysis"
                   ? "bg-primary-container text-on-primary-container scale-98"
                   : "text-on-surface-variant hover:bg-surface-container-highest/40"
-              }`}
+              } ${isSidebarCollapsed ? "justify-center px-0" : ""}`}
+              title="Scheme Analysis"
             >
               <span className="material-symbols-outlined" style={activeSection === "analysis" ? { fontVariationSettings: "'FILL' 1" } : {}}>analytics</span>
-              <span className="text-label-md font-label-md">Scheme Analysis</span>
+              {!isSidebarCollapsed && <span className="text-label-md font-label-md">Scheme Analysis</span>}
             </button>
             <button
-              onClick={() => setActiveSection("safety")}
+              onClick={() => {
+                setActiveSection("safety");
+                setIsMobileMenuOpen(false);
+              }}
               className={`w-full flex items-center gap-md px-md py-xs transition-all text-left rounded-xl ${
                 activeSection === "safety"
                   ? "bg-primary-container text-on-primary-container scale-98"
                   : "text-on-surface-variant hover:bg-surface-container-highest/40"
-              }`}
+              } ${isSidebarCollapsed ? "justify-center px-0" : ""}`}
+              title="Safety Logs"
             >
               <span className="material-symbols-outlined" style={activeSection === "safety" ? { fontVariationSettings: "'FILL' 1" } : {}}>verified_user</span>
-              <span className="text-label-md font-label-md">Safety Logs</span>
+              {!isSidebarCollapsed && <span className="text-label-md font-label-md">Safety Logs</span>}
             </button>
           </nav>
           
           <div className="mt-auto px-xs space-y-1">
-            <button onClick={() => setChatHistory([chatHistory[0]])} className="w-full mb-md py-sm bg-primary text-on-primary font-bold rounded-xl flex items-center justify-center gap-xs active:scale-95 transition-transform">
+            <button 
+              onClick={() => {
+                setChatHistory([chatHistory[0]]);
+                setIsMobileMenuOpen(false);
+              }} 
+              className={`w-full mb-md py-sm bg-primary text-on-primary font-bold rounded-xl flex items-center justify-center gap-xs active:scale-95 transition-transform ${
+                isSidebarCollapsed ? "px-0" : ""
+              }`}
+              title="Clear Chat"
+            >
               <span className="material-symbols-outlined">refresh</span>
-              Clear Chat
+              {!isSidebarCollapsed && "Clear Chat"}
             </button>
             <button 
-              onClick={() => setShowHelpModal(true)}
-              className="w-full flex items-center gap-md px-md py-xs text-on-surface-variant hover:bg-surface-container-highest/40 rounded-xl text-left cursor-pointer transition-colors"
+              onClick={() => {
+                setShowHelpModal(true);
+                setIsMobileMenuOpen(false);
+              }}
+              className={`w-full flex items-center gap-md px-md py-xs text-on-surface-variant hover:bg-surface-container-highest/40 rounded-xl text-left cursor-pointer transition-colors ${
+                isSidebarCollapsed ? "justify-center px-0" : ""
+              }`}
+              title="Help"
             >
               <span className="material-symbols-outlined">help</span>
-              <span className="text-label-md font-label-md">Help</span>
+              {!isSidebarCollapsed && <span className="text-label-md font-label-md">Help</span>}
             </button>
             <button 
-              onClick={() => setShowStatusModal(true)}
-              className="w-full flex items-center gap-md px-md py-xs text-on-surface-variant hover:bg-surface-container-highest/40 rounded-xl text-left cursor-pointer transition-colors"
+              onClick={() => {
+                setShowStatusModal(true);
+                setIsMobileMenuOpen(false);
+              }}
+              className={`w-full flex items-center gap-md px-md py-xs text-on-surface-variant hover:bg-surface-container-highest/40 rounded-xl text-left cursor-pointer transition-colors ${
+                isSidebarCollapsed ? "justify-center px-0" : ""
+              }`}
+              title="Status"
             >
               <span className="material-symbols-outlined">check_circle</span>
-              <span className="text-label-md font-label-md">Status</span>
+              {!isSidebarCollapsed && <span className="text-label-md font-label-md">Status</span>}
             </button>
           </div>
         </aside>
 
         {/* Main Content Area */}
         {activeSection === "analysis" ? (
-          <main className="flex-1 flex flex-col lg:flex-row gap-gutter p-md overflow-hidden w-full">
+          <main className="flex-1 flex flex-col md:flex-row gap-sm md:gap-gutter p-xs sm:p-sm md:p-md overflow-y-auto md:overflow-hidden w-full h-auto md:h-full">
             
-            {/* Left Column - Schemes (40% width on large screen) */}
-            <section className="w-full lg:w-[35%] flex flex-col gap-md h-full overflow-hidden">
+            {/* Left Column - Schemes (responsive width) */}
+            <section className="w-full md:w-[38%] lg:w-[32%] xl:w-[30%] flex flex-col gap-sm md:gap-md h-auto md:h-full overflow-visible md:overflow-hidden flex-none">
               <div className="flex-none">
-                <h2 className="text-headline-md font-headline-md text-on-surface mb-xs">Supported Schemes</h2>
-                <p className="text-on-surface-variant text-label-md">Select a fund to contextualize your queries.</p>
+                <h2 className="text-title-md sm:text-headline-md font-bold text-on-surface mb-xs">Supported Schemes</h2>
+                <p className="text-on-surface-variant text-label-sm sm:text-label-md">Select a fund to contextualize your queries.</p>
               </div>
               
               {/* Fund Cards Container */}
-              <div className="flex-1 flex flex-col gap-sm overflow-y-auto custom-scrollbar pr-xs">
+              <div className="flex flex-col gap-sm md:flex-1 md:overflow-y-auto custom-scrollbar md:pr-xs pr-0">
                 {SCHEMES.map((scheme) => (
                   <div
                     key={scheme.id}
                     onClick={() => setSelectedScheme(scheme)}
-                    className={`glass-panel p-md rounded-xl group relative overflow-hidden cursor-pointer transition-all border ${
+                    className={`glass-panel p-sm sm:p-md rounded-xl group relative overflow-hidden cursor-pointer transition-all border ${
                       selectedScheme.id === scheme.id ? 'border-primary bg-primary/5 jade-glow' : 'border-outline-variant/20 hover:border-primary/40'
                     }`}
                   >
@@ -381,22 +467,22 @@ export default function App() {
                         {scheme.icon}
                       </span>
                     </div>
-                    <h3 className="text-body-lg font-bold text-on-surface">{scheme.name}</h3>
-                    <p className="text-label-md text-on-surface-variant">{scheme.description}</p>
+                    <h3 className="text-body-md sm:text-body-lg font-bold text-on-surface">{scheme.name}</h3>
+                    <p className="text-label-sm sm:text-label-md text-on-surface-variant">{scheme.description}</p>
                     
                     {/* Stats Grid */}
-                    <div className="mt-md pt-md border-t border-outline-variant/20 flex justify-between items-center transition-all duration-300">
-                      <div className="text-center">
-                        <div className="text-label-sm text-on-surface-variant">Asset Class</div>
-                        <div className="text-label-md font-bold text-primary">{scheme.assetClass}</div>
+                    <div className="mt-md pt-md border-t border-outline-variant/20 grid grid-cols-3 gap-xs text-center transition-all duration-300">
+                      <div>
+                        <div className="text-[10px] sm:text-label-sm text-on-surface-variant truncate">Asset Class</div>
+                        <div className="text-label-sm sm:text-label-md font-bold text-primary truncate">{scheme.assetClass}</div>
                       </div>
-                      <div className="text-center">
-                        <div className="text-label-sm text-on-surface-variant">Launch Date</div>
-                        <div className="text-label-md font-bold text-primary">{scheme.launchDate}</div>
+                      <div>
+                        <div className="text-[10px] sm:text-label-sm text-on-surface-variant truncate">Launch Date</div>
+                        <div className="text-label-sm sm:text-label-md font-bold text-primary truncate">{scheme.launchDate}</div>
                       </div>
-                      <div className="text-center">
-                        <div className="text-label-sm text-on-surface-variant">AUM</div>
-                        <div className="text-label-md font-bold text-primary">{scheme.aum}</div>
+                      <div>
+                        <div className="text-[10px] sm:text-label-sm text-on-surface-variant truncate">AUM</div>
+                        <div className="text-label-sm sm:text-label-md font-bold text-primary truncate">{scheme.aum}</div>
                       </div>
                     </div>
                   </div>
@@ -411,7 +497,7 @@ export default function App() {
                     <button
                       key={idx}
                       onClick={() => handleTemplateClick(tpl.query)}
-                      className="px-md py-xs glass-panel rounded-full text-label-md text-on-surface-variant hover:text-primary hover:border-primary/50 transition-colors text-left"
+                      className="px-md py-[10px] md:py-xs glass-panel rounded-full text-label-md text-on-surface-variant hover:text-primary hover:border-primary/50 transition-colors text-left min-h-[44px] md:min-h-0 flex items-center"
                     >
                       {tpl.label}
                     </button>
@@ -420,8 +506,8 @@ export default function App() {
               </div>
             </section>
 
-            {/* Right Column - Conversational results (65% width) */}
-            <section className="flex-1 flex flex-col gap-md h-full relative overflow-hidden">
+            {/* Right Column - Conversational results (responsive layout width) */}
+            <section className="flex-1 flex flex-col gap-sm md:gap-md h-auto md:h-full relative overflow-visible md:overflow-hidden w-full">
               
               {/* Search Input Box */}
               <form
@@ -429,7 +515,7 @@ export default function App() {
                   e.preventDefault();
                   handleQuery(queryInput);
                 }}
-                className="glass-panel p-sm rounded-2xl jade-glow-strong border-primary/20 flex items-center gap-md flex-none"
+                className="glass-panel p-xs sm:p-sm rounded-2xl jade-glow-strong border-primary/20 flex items-center gap-xs sm:gap-md flex-none w-full"
               >
                 <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-none">
                   <span className="material-symbols-outlined text-primary">psychology</span>
@@ -437,7 +523,7 @@ export default function App() {
                 <input
                   value={queryInput}
                   onChange={(e) => setQueryInput(e.target.value)}
-                  className="bg-transparent border-none outline-none focus:ring-0 text-body-lg text-on-surface w-full placeholder:text-outline/50 focus:outline-none"
+                  className="bg-transparent border-none outline-none focus:ring-0 text-body-md sm:text-body-lg text-on-surface w-full placeholder:text-outline/50 focus:outline-none min-w-0"
                   placeholder={`Ask about ${selectedScheme.name} (e.g., minimum investment, TER, exit load)...`}
                   type="text"
                   disabled={loading}
@@ -456,19 +542,19 @@ export default function App() {
               </form>
 
               {/* Chat History Canvas */}
-              <div className="flex-1 overflow-y-auto custom-scrollbar pr-xs space-y-md">
+              <div className="md:flex-1 md:overflow-y-auto custom-scrollbar md:pr-xs pr-0 space-y-md md:h-full h-auto overflow-visible">
                 {chatHistory.map((msg, index) => (
                   <div key={index} className="space-y-sm">
                     {msg.role === 'user' ? (
                       /* User Question */
                       <div className="flex justify-end">
-                        <div className="max-w-[80%] glass-panel px-md py-sm rounded-2xl rounded-tr-none text-on-surface border-primary/10 bg-surface-container/20">
-                          <p className="text-body-md">{msg.text}</p>
+                        <div className="max-w-[85%] sm:max-w-[80%] glass-panel px-sm py-xs sm:px-md sm:py-sm rounded-2xl rounded-tr-none text-on-surface border-primary/10 bg-surface-container/20">
+                          <p className="text-body-md break-words whitespace-pre-wrap">{msg.text}</p>
                         </div>
                       </div>
                     ) : (
                       /* Assistant Answer Card */
-                      <div className="glass-panel p-lg rounded-2xl relative border-outline-variant/15">
+                      <div className="glass-panel p-sm sm:p-md md:p-lg rounded-2xl relative border-outline-variant/15">
                         {msg.question && (
                           <div className="text-label-sm text-outline mb-xs italic">
                             Query: "{msg.question}"
@@ -477,24 +563,24 @@ export default function App() {
                         
                         {/* State Indicator Headers */}
                         {msg.is_advice ? (
-                          <div className="flex items-center gap-xs mb-md">
-                            <span className="material-symbols-outlined text-error" style={{ fontVariationSettings: "'FILL' 1" }}>gpp_maybe</span>
+                          <div className="flex items-center gap-xs mb-sm sm:mb-md">
+                            <span className="material-symbols-outlined text-error text-md sm:text-lg" style={{ fontVariationSettings: "'FILL' 1" }}>gpp_maybe</span>
                             <span className="text-label-sm font-bold text-error tracking-widest uppercase">Advice Refusal Alert</span>
                           </div>
                         ) : msg.is_ambiguous ? (
-                          <div className="flex items-center gap-xs mb-md">
-                            <span className="material-symbols-outlined text-tertiary" style={{ fontVariationSettings: "'FILL' 1" }}>help</span>
+                          <div className="flex items-center gap-xs mb-sm sm:mb-md">
+                            <span className="material-symbols-outlined text-tertiary text-md sm:text-lg" style={{ fontVariationSettings: "'FILL' 1" }}>help</span>
                             <span className="text-label-sm font-bold text-tertiary tracking-widest uppercase">Clarification Required</span>
                           </div>
                         ) : (
-                          <div className="flex items-center gap-xs mb-md flex-wrap gap-y-xs">
-                            <span className="material-symbols-outlined text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
+                          <div className="flex items-center gap-xs mb-sm sm:mb-md flex-wrap gap-y-xs">
+                            <span className="material-symbols-outlined text-primary text-md sm:text-lg" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
                             <span className="text-label-sm font-bold text-primary tracking-widest uppercase">Factual Answer</span>
                             <span className="mx-xs h-3 w-[1px] bg-outline-variant/30 hidden sm:inline"></span>
                             
                             {/* Citation Tag */}
                             {parseAnswerText(msg.answer).citation && (
-                              <span className="text-label-sm bg-surface-container-high px-xs py-0.5 rounded text-on-surface-variant">
+                              <span className="text-label-sm bg-surface-container-high px-xs py-0.5 rounded text-on-surface-variant max-w-[200px] truncate" title={parseAnswerText(msg.answer).citation}>
                                 {parseAnswerText(msg.answer).citation}
                               </span>
                             )}
@@ -504,12 +590,12 @@ export default function App() {
                         {/* Answer Body */}
                         <div className="space-y-md">
                           {msg.is_advice ? (
-                            <p className="text-body-lg text-error/90 leading-relaxed font-semibold">
+                            <p className="text-body-md sm:text-body-lg text-error/90 leading-relaxed font-semibold break-words whitespace-pre-wrap">
                               {msg.answer}
                             </p>
                           ) : msg.is_ambiguous ? (
                             <div className="space-y-sm">
-                              <p className="text-body-lg text-tertiary leading-relaxed font-semibold">
+                              <p className="text-body-md sm:text-body-lg text-tertiary leading-relaxed font-semibold break-words whitespace-pre-wrap">
                                 {msg.answer}
                               </p>
                               <div className="flex flex-wrap gap-xs pt-xs">
@@ -531,7 +617,7 @@ export default function App() {
                               </div>
                             </div>
                           ) : (
-                            <p className="text-body-lg leading-relaxed text-on-surface">
+                            <p className="text-body-md sm:text-body-lg leading-relaxed text-on-surface break-words whitespace-pre-wrap">
                               {parseAnswerText(msg.answer).body}
                             </p>
                           )}
@@ -539,13 +625,13 @@ export default function App() {
 
                         {/* Retrieved Grounding Chunks Accordion */}
                         {!msg.is_advice && !msg.is_ambiguous && msg.chunks && msg.chunks.length > 0 && (
-                          <details className="group mt-lg pt-lg border-t border-outline-variant/20">
-                            <summary className="flex items-center justify-between cursor-pointer list-none select-none">
+                          <details className="group mt-sm sm:mt-md md:mt-lg pt-sm sm:pt-md md:pt-lg border-t border-outline-variant/20">
+                            <summary className="flex items-center justify-between cursor-pointer list-none select-none flex-wrap gap-y-xs">
                               <div className="flex items-center gap-xs">
                                 <span className="material-symbols-outlined text-primary transition-transform duration-200 group-open:rotate-180">
                                   expand_more
                                 </span>
-                                <h4 className="text-label-md font-bold flex items-center gap-xs">
+                                <h4 className="text-label-sm sm:text-label-md font-bold flex items-center gap-xs">
                                   <span className="material-symbols-outlined text-sm">attachment</span>
                                   Grounding &amp; Reference Chunks
                                 </h4>
@@ -555,8 +641,8 @@ export default function App() {
                             
                             <div className="space-y-sm mt-md">
                               {msg.chunks.map((chunk, cIdx) => (
-                                <div key={chunk.id || cIdx} className="glass-panel bg-surface-container-low/40 p-md rounded-xl border-primary/10">
-                                  <div className="flex items-center gap-md mb-sm">
+                                <div key={chunk.id || cIdx} className="glass-panel bg-surface-container-low/40 p-xs sm:p-md rounded-xl border-primary/10">
+                                  <div className="flex flex-col sm:flex-row sm:items-center gap-sm sm:gap-md mb-sm">
                                     
                                     {/* Score indicator */}
                                     <div className="relative w-12 h-12 flex-none">
@@ -588,9 +674,9 @@ export default function App() {
                                       </div>
                                     </div>
                                     
-                                    <span className="material-symbols-outlined text-outline/50 text-sm">verified</span>
+                                    <span className="material-symbols-outlined text-outline/50 text-sm hidden sm:inline">verified</span>
                                   </div>
-                                  <p className="text-label-md italic text-on-surface-variant border-l-2 border-primary pl-md py-xs leading-relaxed bg-surface-container-lowest/20 rounded-r-lg">
+                                  <p className="text-label-sm sm:text-label-md italic text-on-surface-variant border-l-2 border-primary pl-sm py-xs leading-relaxed bg-surface-container-lowest/20 rounded-r-lg break-words whitespace-pre-wrap">
                                     "{chunk.text}"
                                   </p>
                                 </div>
@@ -607,16 +693,16 @@ export default function App() {
             </section>
           </main>
         ) : activeSection === "knowledge" ? (
-          <main className="flex-1 flex flex-col gap-lg p-lg overflow-y-auto w-full custom-scrollbar max-w-6xl mx-auto pb-2xl">
+          <main className="flex-1 flex flex-col gap-sm sm:gap-lg p-xs sm:p-lg overflow-y-auto w-full custom-scrollbar max-w-6xl mx-auto pb-2xl h-auto md:h-full">
             {/* Header */}
             <div className="mt-md">
-              <h2 className="text-headline-lg font-bold text-on-surface mb-xs">Knowledge Base Registry</h2>
-              <p className="text-on-surface-variant text-body-md">Ingested official documents and vector store registry for the RAG chatbot.</p>
+              <h2 className="text-headline-md sm:text-headline-lg font-bold text-on-surface mb-xs">Knowledge Base Registry</h2>
+              <p className="text-on-surface-variant text-label-sm sm:text-body-md">Ingested official documents and vector store registry for the RAG chatbot.</p>
             </div>
 
             {/* Quick Stats Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-md">
-              <div className="glass-panel p-md rounded-2xl border-primary/20 bg-primary/5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-sm sm:gap-md">
+              <div className="glass-panel p-sm sm:p-md rounded-2xl border-primary/20 bg-primary/5">
                 <div className="flex items-center gap-sm">
                   <span className="material-symbols-outlined text-primary text-xl">database</span>
                   <div>
@@ -625,7 +711,7 @@ export default function App() {
                   </div>
                 </div>
               </div>
-              <div className="glass-panel p-md rounded-2xl border-outline-variant/20">
+              <div className="glass-panel p-sm sm:p-md rounded-2xl border-outline-variant/20">
                 <div className="flex items-center gap-sm">
                   <span className="material-symbols-outlined text-primary text-xl">description</span>
                   <div>
@@ -634,7 +720,7 @@ export default function App() {
                   </div>
                 </div>
               </div>
-              <div className="glass-panel p-md rounded-2xl border-outline-variant/20">
+              <div className="glass-panel p-sm sm:p-md rounded-2xl border-outline-variant/20">
                 <div className="flex items-center gap-sm">
                   <span className="material-symbols-outlined text-primary text-xl">category</span>
                   <div>
@@ -643,7 +729,7 @@ export default function App() {
                   </div>
                 </div>
               </div>
-              <div className="glass-panel p-md rounded-2xl border-outline-variant/20">
+              <div className="glass-panel p-sm sm:p-md rounded-2xl border-outline-variant/20">
                 <div className="flex items-center gap-sm">
                   <span className="material-symbols-outlined text-primary text-xl">published_with_changes</span>
                   <div>
@@ -655,19 +741,19 @@ export default function App() {
             </div>
 
             {/* Content Split: Schemes & Sources */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-lg">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-sm sm:gap-lg">
               {/* Left Column: Supported Schemes (5 cols) */}
               <div className="lg:col-span-5 flex flex-col gap-md">
                 <h3 className="text-title-md font-bold text-on-surface">Supported Mutual Fund Schemes</h3>
                 <div className="flex flex-col gap-sm">
                   {SCHEMES.map(s => (
-                    <div key={s.id} className="glass-panel p-md rounded-xl border-outline-variant/10 bg-surface-container-low/20">
+                    <div key={s.id} className="glass-panel p-sm sm:p-md rounded-xl border-outline-variant/10 bg-surface-container-low/20">
                       <div className="flex justify-between items-center mb-xs">
                         <span className={`text-label-sm font-label-sm px-xs py-0.5 rounded border ${s.tagColor}`}>{s.type}</span>
                         <span className="text-label-sm text-outline">AUM: {s.aum}</span>
                       </div>
                       <h4 className="text-body-md font-bold text-on-surface mb-xs">{s.name}</h4>
-                      <p className="text-label-md text-on-surface-variant leading-relaxed">{s.description}</p>
+                      <p className="text-label-sm sm:text-label-md text-on-surface-variant leading-relaxed">{s.description}</p>
                       <div className="flex gap-md mt-sm pt-sm border-t border-outline-variant/10 text-label-sm text-primary">
                         <span>Class: {s.assetClass}</span>
                         <span>•</span>
@@ -682,7 +768,7 @@ export default function App() {
               <div className="lg:col-span-7 flex flex-col gap-md">
                 <h3 className="text-title-md font-bold text-on-surface">Ingested Source Registries</h3>
                 <div className="flex flex-col gap-sm">
-                  <div className="glass-panel p-md rounded-xl border-outline-variant/10 bg-surface-container-low/20">
+                  <div className="glass-panel p-sm sm:p-md rounded-xl border-outline-variant/10 bg-surface-container-low/20">
                     <div className="flex justify-between items-start mb-sm">
                       <div className="flex items-center gap-xs">
                         <span className="material-symbols-outlined text-primary">picture_as_pdf</span>
@@ -690,11 +776,11 @@ export default function App() {
                       </div>
                       <span className="text-label-sm px-xs py-0.5 rounded bg-primary/10 text-primary border border-primary/20 font-bold">1.47 MB</span>
                     </div>
-                    <p className="text-label-md text-on-surface-variant mb-xs leading-relaxed">Official scheme factsheet covering exit load (0.10% / Nil), benchmark index (BSE 500 TRI), riskometer (Very High), and minimum investment rules.</p>
+                    <p className="text-label-sm sm:text-label-md text-on-surface-variant mb-xs leading-relaxed">Official scheme factsheet covering exit load (0.10% / Nil), benchmark index (BSE 500 TRI), riskometer (Very High), and minimum investment rules.</p>
                     <div className="text-label-sm text-outline font-mono truncate">SHA256: 033f97f7872c9765a9cbd80dd20581dff1ad8d66ab4e10564b0136748069d380</div>
                   </div>
 
-                  <div className="glass-panel p-md rounded-xl border-outline-variant/10 bg-surface-container-low/20">
+                  <div className="glass-panel p-sm sm:p-md rounded-xl border-outline-variant/10 bg-surface-container-low/20">
                     <div className="flex justify-between items-start mb-sm">
                       <div className="flex items-center gap-xs">
                         <span className="material-symbols-outlined text-primary">picture_as_pdf</span>
@@ -702,11 +788,11 @@ export default function App() {
                       </div>
                       <span className="text-label-sm px-xs py-0.5 rounded bg-primary/10 text-primary border border-primary/20 font-bold">1.48 MB</span>
                     </div>
-                    <p className="text-label-md text-on-surface-variant mb-xs leading-relaxed">Official Facts document describing ELSS scheme features, investment objective, and the 3-year lock-in period for Section 80C tax benefits.</p>
+                    <p className="text-label-sm sm:text-label-md text-on-surface-variant mb-xs leading-relaxed">Official Facts document describing ELSS scheme features, investment objective, and the 3-year lock-in period for Section 80C tax benefits.</p>
                     <div className="text-label-sm text-outline font-mono truncate">SHA256: fe2125bfbd69071f503d9b1434cd3f420aa5996a2b9df2f32aef94d39f9a80c3</div>
                   </div>
 
-                  <div className="glass-panel p-md rounded-xl border-outline-variant/10 bg-surface-container-low/20">
+                  <div className="glass-panel p-sm sm:p-md rounded-xl border-outline-variant/10 bg-surface-container-low/20">
                     <div className="flex justify-between items-start mb-sm">
                       <div className="flex items-center gap-xs">
                         <span className="material-symbols-outlined text-primary">picture_as_pdf</span>
@@ -714,11 +800,11 @@ export default function App() {
                       </div>
                       <span className="text-label-sm px-xs py-0.5 rounded bg-primary/10 text-primary border border-primary/20 font-bold">1.47 MB</span>
                     </div>
-                    <p className="text-label-md text-on-surface-variant mb-xs leading-relaxed">Factsheet details for the Large Cap Fund detailing exit load (1.00% / Nil), scheme riskometer, and investment criteria.</p>
+                    <p className="text-label-sm sm:text-label-md text-on-surface-variant mb-xs leading-relaxed">Factsheet details for the Large Cap Fund detailing exit load (1.00% / Nil), scheme riskometer, and investment criteria.</p>
                     <div className="text-label-sm text-outline font-mono truncate">SHA256: 12178b0940bdb20d12f5313399d70a6c153c3bd465c85ebf657be08d7ba2f427</div>
                   </div>
 
-                  <div className="glass-panel p-md rounded-xl border-outline-variant/10 bg-surface-container-low/20">
+                  <div className="glass-panel p-sm sm:p-md rounded-xl border-outline-variant/10 bg-surface-container-low/20">
                     <div className="flex justify-between items-start mb-sm">
                       <div className="flex items-center gap-xs">
                         <span className="material-symbols-outlined text-primary">table_chart</span>
@@ -726,7 +812,7 @@ export default function App() {
                       </div>
                       <span className="text-label-sm px-xs py-0.5 rounded bg-primary/10 text-primary border border-primary/20 font-bold">550 KB</span>
                     </div>
-                    <p className="text-label-md text-on-surface-variant mb-xs leading-relaxed">Granular day-to-day Total Expense Ratio (TER) data logs mapping direct and regular plans of the Flexicap, ELSS, and Large Cap funds.</p>
+                    <p className="text-label-sm sm:text-label-md text-on-surface-variant mb-xs leading-relaxed">Granular day-to-day Total Expense Ratio (TER) data logs mapping direct and regular plans of the Flexicap, ELSS, and Large Cap funds.</p>
                     <div className="text-label-sm text-outline font-mono truncate">SHA256: e5d48e40285105c70ec305081b62e479049157d3a37d7cf1621a39007fa72941</div>
                   </div>
                 </div>
@@ -734,18 +820,18 @@ export default function App() {
             </div>
           </main>
         ) : activeSection === "templates" ? (
-          <main className="flex-1 flex flex-col gap-lg p-lg overflow-y-auto w-full custom-scrollbar max-w-5xl mx-auto pb-2xl">
+          <main className="flex-1 flex flex-col gap-sm sm:gap-lg p-xs sm:p-lg overflow-y-auto w-full custom-scrollbar max-w-5xl mx-auto pb-2xl h-auto md:h-full">
             {/* Header */}
             <div className="mt-md">
-              <h2 className="text-headline-lg font-bold text-on-surface mb-xs">Query Template Library</h2>
-              <p className="text-on-surface-variant text-body-md">Choose one of the common query templates below to test the RAG chatbot's response.</p>
+              <h2 className="text-headline-md sm:text-headline-lg font-bold text-on-surface mb-xs">Query Template Library</h2>
+              <p className="text-on-surface-variant text-label-sm sm:text-body-md">Choose one of the common query templates below to test the RAG chatbot's response.</p>
             </div>
 
             {/* Template Groups */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-lg">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-sm sm:gap-lg">
               
               {/* Group 1: Scheme Exit Loads */}
-              <div className="glass-panel p-lg rounded-2xl border-outline-variant/10 flex flex-col gap-md bg-surface-container-low/10">
+              <div className="glass-panel p-sm sm:p-md md:p-lg rounded-2xl border-outline-variant/10 flex flex-col gap-sm sm:gap-md bg-surface-container-low/10">
                 <div className="flex items-center gap-xs text-primary mb-xs">
                   <span className="material-symbols-outlined">payments</span>
                   <h3 className="text-title-md font-bold text-on-surface">Exit Loads &amp; Fees</h3>
@@ -763,7 +849,7 @@ export default function App() {
                         setActiveSection("analysis");
                         handleQuery(q);
                       }}
-                      className="w-full text-left p-md rounded-xl bg-surface-container-low/40 hover:bg-primary/5 border border-outline-variant/10 hover:border-primary/40 transition-all text-body-md text-on-surface-variant hover:text-primary flex justify-between items-center group"
+                      className="w-full text-left p-xs sm:p-sm md:p-md rounded-xl bg-surface-container-low/40 hover:bg-primary/5 border border-outline-variant/10 hover:border-primary/40 transition-all text-label-sm sm:text-body-md text-on-surface-variant hover:text-primary flex justify-between items-center group"
                     >
                       <span>{q}</span>
                       <span className="material-symbols-outlined text-outline group-hover:text-primary transition-transform group-hover:translate-x-1">arrow_forward</span>
@@ -773,7 +859,7 @@ export default function App() {
               </div>
 
               {/* Group 2: Total Expense Ratio (TER) */}
-              <div className="glass-panel p-lg rounded-2xl border-outline-variant/10 flex flex-col gap-md bg-surface-container-low/10">
+              <div className="glass-panel p-sm sm:p-md md:p-lg rounded-2xl border-outline-variant/10 flex flex-col gap-sm sm:gap-md bg-surface-container-low/10">
                 <div className="flex items-center gap-xs text-primary mb-xs">
                   <span className="material-symbols-outlined">analytics</span>
                   <h3 className="text-title-md font-bold text-on-surface">Total Expense Ratio (TER)</h3>
@@ -791,7 +877,7 @@ export default function App() {
                         setActiveSection("analysis");
                         handleQuery(q);
                       }}
-                      className="w-full text-left p-md rounded-xl bg-surface-container-low/40 hover:bg-primary/5 border border-outline-variant/10 hover:border-primary/40 transition-all text-body-md text-on-surface-variant hover:text-primary flex justify-between items-center group"
+                      className="w-full text-left p-xs sm:p-sm md:p-md rounded-xl bg-surface-container-low/40 hover:bg-primary/5 border border-outline-variant/10 hover:border-primary/40 transition-all text-label-sm sm:text-body-md text-on-surface-variant hover:text-primary flex justify-between items-center group"
                     >
                       <span>{q}</span>
                       <span className="material-symbols-outlined text-outline group-hover:text-primary transition-transform group-hover:translate-x-1">arrow_forward</span>
@@ -801,7 +887,7 @@ export default function App() {
               </div>
 
               {/* Group 3: Benchmarks & Lock-in Periods */}
-              <div className="glass-panel p-lg rounded-2xl border-outline-variant/10 flex flex-col gap-md bg-surface-container-low/10">
+              <div className="glass-panel p-sm sm:p-md md:p-lg rounded-2xl border-outline-variant/10 flex flex-col gap-sm sm:gap-md bg-surface-container-low/10">
                 <div className="flex items-center gap-xs text-primary mb-xs">
                   <span className="material-symbols-outlined">show_chart</span>
                   <h3 className="text-title-md font-bold text-on-surface">Benchmarks &amp; Lock-in Periods</h3>
@@ -819,7 +905,7 @@ export default function App() {
                         setActiveSection("analysis");
                         handleQuery(q);
                       }}
-                      className="w-full text-left p-md rounded-xl bg-surface-container-low/40 hover:bg-primary/5 border border-outline-variant/10 hover:border-primary/40 transition-all text-body-md text-on-surface-variant hover:text-primary flex justify-between items-center group"
+                      className="w-full text-left p-xs sm:p-sm md:p-md rounded-xl bg-surface-container-low/40 hover:bg-primary/5 border border-outline-variant/10 hover:border-primary/40 transition-all text-label-sm sm:text-body-md text-on-surface-variant hover:text-primary flex justify-between items-center group"
                     >
                       <span>{q}</span>
                       <span className="material-symbols-outlined text-outline group-hover:text-primary transition-transform group-hover:translate-x-1">arrow_forward</span>
@@ -829,7 +915,7 @@ export default function App() {
               </div>
 
               {/* Group 4: Investment Objectives & SIPs */}
-              <div className="glass-panel p-lg rounded-2xl border-outline-variant/10 flex flex-col gap-md bg-surface-container-low/10">
+              <div className="glass-panel p-sm sm:p-md md:p-lg rounded-2xl border-outline-variant/10 flex flex-col gap-sm sm:gap-md bg-surface-container-low/10">
                 <div className="flex items-center gap-xs text-primary mb-xs">
                   <span className="material-symbols-outlined">assignment</span>
                   <h3 className="text-title-md font-bold text-on-surface">Objectives &amp; SIP Thresholds</h3>
@@ -847,7 +933,7 @@ export default function App() {
                         setActiveSection("analysis");
                         handleQuery(q);
                       }}
-                      className="w-full text-left p-md rounded-xl bg-surface-container-low/40 hover:bg-primary/5 border border-outline-variant/10 hover:border-primary/40 transition-all text-body-md text-on-surface-variant hover:text-primary flex justify-between items-center group"
+                      className="w-full text-left p-xs sm:p-sm md:p-md rounded-xl bg-surface-container-low/40 hover:bg-primary/5 border border-outline-variant/10 hover:border-primary/40 transition-all text-label-sm sm:text-body-md text-on-surface-variant hover:text-primary flex justify-between items-center group"
                     >
                       <span>{q}</span>
                       <span className="material-symbols-outlined text-outline group-hover:text-primary transition-transform group-hover:translate-x-1">arrow_forward</span>
@@ -859,16 +945,16 @@ export default function App() {
             </div>
           </main>
         ) : activeSection === "safety" ? (
-          <main className="flex-1 flex flex-col gap-lg p-lg overflow-y-auto w-full custom-scrollbar max-w-5xl mx-auto pb-2xl">
+          <main className="flex-1 flex flex-col gap-sm sm:gap-lg p-xs sm:p-lg overflow-y-auto w-full custom-scrollbar max-w-5xl mx-auto pb-2xl h-auto md:h-full">
             {/* Header */}
             <div className="mt-md">
-              <h2 className="text-headline-lg font-bold text-on-surface mb-xs">Safety &amp; Compliance Monitor</h2>
-              <p className="text-on-surface-variant text-body-md">Real-time safety guardrail behavior logs and regulatory compliance checks.</p>
+              <h2 className="text-headline-md sm:text-headline-lg font-bold text-on-surface mb-xs">Safety &amp; Compliance Monitor</h2>
+              <p className="text-on-surface-variant text-label-sm sm:text-body-md">Real-time safety guardrail behavior logs and regulatory compliance checks.</p>
             </div>
 
             {/* Safety Stats Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-md">
-              <div className="glass-panel p-md rounded-2xl border-primary/10">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-sm sm:gap-md">
+              <div className="glass-panel p-sm sm:p-md rounded-2xl border-primary/10">
                 <div className="flex items-center gap-sm">
                   <span className="material-symbols-outlined text-primary text-xl">shield</span>
                   <div>
@@ -877,7 +963,7 @@ export default function App() {
                   </div>
                 </div>
               </div>
-              <div className="glass-panel p-md rounded-2xl border-primary/10">
+              <div className="glass-panel p-sm sm:p-md rounded-2xl border-primary/10">
                 <div className="flex items-center gap-sm">
                   <span className="material-symbols-outlined text-primary text-xl">rule</span>
                   <div>
@@ -886,7 +972,7 @@ export default function App() {
                   </div>
                 </div>
               </div>
-              <div className="glass-panel p-md rounded-2xl border-primary/10">
+              <div className="glass-panel p-sm sm:p-md rounded-2xl border-primary/10">
                 <div className="flex items-center gap-sm">
                   <span className="material-symbols-outlined text-primary text-xl">verified_user</span>
                   <div>
@@ -898,7 +984,7 @@ export default function App() {
             </div>
 
             {/* Detailed Guardrails Explanation */}
-            <div className="glass-panel p-lg rounded-2xl border-outline-variant/10 space-y-md bg-surface-container-low/10">
+            <div className="glass-panel p-sm sm:p-md md:p-lg rounded-2xl border-outline-variant/10 space-y-md bg-surface-container-low/10">
               <h3 className="text-title-md font-bold text-on-surface">System Guardrails &amp; Intent Classification</h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-md">
                 
@@ -907,7 +993,7 @@ export default function App() {
                     <span className="material-symbols-outlined text-sm">gpp_maybe</span>
                     <span>Advice Refusal</span>
                   </div>
-                  <p className="text-label-md text-on-surface-variant leading-relaxed">
+                  <p className="text-label-sm sm:text-label-md text-on-surface-variant leading-relaxed">
                     Identifies advisory intent (e.g. buying recommendations, asset allocation opinions) and blocks execution. The system refuses to suggest investments, providing only facts from official factsheets.
                   </p>
                 </div>
@@ -917,7 +1003,7 @@ export default function App() {
                     <span className="material-symbols-outlined text-sm">help</span>
                     <span>Ambiguity Resolver</span>
                   </div>
-                  <p className="text-label-md text-on-surface-variant leading-relaxed">
+                  <p className="text-label-sm sm:text-label-md text-on-surface-variant leading-relaxed">
                     Checks if queries specify which scheme to inspect. If the query is ambiguous, it requests clarification and offers quick-selection buttons for supported schemes.
                   </p>
                 </div>
@@ -927,7 +1013,7 @@ export default function App() {
                     <span className="material-symbols-outlined text-sm">done_all</span>
                     <span>Grounding Validation</span>
                   </div>
-                  <p className="text-label-md text-on-surface-variant leading-relaxed">
+                  <p className="text-label-sm sm:text-label-md text-on-surface-variant leading-relaxed">
                     A post-generation step parses all numbers and percentages (like exit load fees, lock-in periods) in the generated text, ensuring they exist exactly in the retrieved context chunks to block hallucinated figures.
                   </p>
                 </div>
@@ -942,7 +1028,7 @@ export default function App() {
               <div className="space-y-sm">
                 
                 {/* Case 1 */}
-                <div className="glass-panel p-md rounded-xl border-error/20 bg-error/5 flex flex-col gap-xs">
+                <div className="glass-panel p-sm sm:p-md rounded-xl border-error/20 bg-error/5 flex flex-col gap-xs">
                   <div className="flex justify-between items-center">
                     <span className="text-label-sm font-bold text-error tracking-widest uppercase flex items-center gap-xs">
                       <span className="material-symbols-outlined text-sm">gpp_maybe</span>
@@ -959,13 +1045,13 @@ export default function App() {
                 </div>
 
                 {/* Case 2 */}
-                <div className="glass-panel p-md rounded-xl border-tertiary/20 bg-tertiary/5 flex flex-col gap-xs">
+                <div className="glass-panel p-sm sm:p-md rounded-xl border-tertiary/20 bg-tertiary/5 flex flex-col gap-xs">
                   <div className="flex justify-between items-center">
                     <span className="text-label-sm font-bold text-tertiary tracking-widest uppercase flex items-center gap-xs">
                       <span className="material-symbols-outlined text-sm">help</span>
                       Ambiguity Classifier
                     </span>
-                    <span className="text-label-sm text-outline">Intent: Incomplete Schema Specification</span>
+                    <span className="text-label-sm text-outline">Intent: Incomplete Scheme Specification</span>
                   </div>
                   <div className="text-body-md font-semibold text-on-surface mt-xs">
                     Query: "What is the expense ratio?"
@@ -976,7 +1062,7 @@ export default function App() {
                 </div>
 
                 {/* Case 3 */}
-                <div className="glass-panel p-md rounded-xl border-outline-variant/20 bg-surface-container-low/20 flex flex-col gap-xs">
+                <div className="glass-panel p-sm sm:p-md rounded-xl border-outline-variant/20 bg-surface-container-low/20 flex flex-col gap-xs">
                   <div className="flex justify-between items-center">
                     <span className="text-label-sm font-bold text-primary tracking-widest uppercase flex items-center gap-xs">
                       <span className="material-symbols-outlined text-sm">cancel</span>
@@ -999,7 +1085,7 @@ export default function App() {
       </div>
 
       {/* Fixed Footer Disclaimer */}
-      <footer className="fixed bottom-0 left-0 w-full z-50 flex flex-col justify-center items-center bg-surface-container-lowest/90 backdrop-blur-md border-t border-outline-variant/20 py-xs px-md">
+      <footer className="md:fixed md:bottom-0 md:left-0 md:w-full z-50 flex flex-col justify-center items-center bg-surface-container-lowest/90 backdrop-blur-md border-t border-outline-variant/20 py-sm px-sm md:py-xs md:px-md relative w-full h-auto mt-auto">
         <div className="flex gap-md mb-1">
           <span className="text-label-sm text-on-surface-variant text-center">
             © 2026 SBI Mutual Fund. Factual RAG Assistant • Grounded Facts-Only Mode Active.
@@ -1016,11 +1102,11 @@ export default function App() {
 
       {/* Help Modal */}
       {showHelpModal && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-md">
-          <div className="glass-panel p-lg rounded-2xl border-primary/20 bg-surface-container/90 max-w-lg w-full flex flex-col gap-md shadow-2xl relative">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-sm sm:p-md">
+          <div className="glass-panel p-sm sm:p-lg rounded-2xl border-primary/20 bg-surface-container/90 max-w-lg w-[90vw] max-h-[85vh] flex flex-col gap-sm sm:gap-md shadow-2xl relative overflow-hidden">
             <button 
               onClick={() => setShowHelpModal(false)}
-              className="absolute top-md right-md material-symbols-outlined text-outline hover:text-primary transition-colors cursor-pointer"
+              className="absolute top-sm right-sm sm:top-md sm:right-md material-symbols-outlined text-outline hover:text-primary transition-colors cursor-pointer"
             >
               close
             </button>
@@ -1045,7 +1131,7 @@ export default function App() {
               </div>
 
               <div>
-                <h4 className="font-bold text-on-surface mb-xs font-headline-sm">Facts-Only Policy:</h4>
+                <h4 className="font-bold text-on-surface mb-xs font-headline-sm font-semibold">Facts-Only Policy:</h4>
                 <p className="leading-relaxed">Answers are generated strictly using ingested official documents. The system cannot provide investment advice, asset allocation opinions, or buying recommendations.</p>
               </div>
 
@@ -1061,7 +1147,7 @@ export default function App() {
 
             <button 
               onClick={() => setShowHelpModal(false)}
-              className="mt-sm w-full py-sm bg-primary text-on-primary font-bold rounded-xl active:scale-95 transition-transform"
+              className="mt-sm w-full py-sm bg-primary text-on-primary font-bold rounded-xl active:scale-95 transition-transform flex-none"
             >
               Close Help
             </button>
@@ -1071,11 +1157,11 @@ export default function App() {
 
       {/* Status Modal */}
       {showStatusModal && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-md">
-          <div className="glass-panel p-lg rounded-2xl border-primary/20 bg-surface-container/90 max-w-lg w-full flex flex-col gap-md shadow-2xl relative">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-sm sm:p-md">
+          <div className="glass-panel p-sm sm:p-lg rounded-2xl border-primary/20 bg-surface-container/90 max-w-lg w-[90vw] max-h-[85vh] flex flex-col gap-sm sm:gap-md shadow-2xl relative overflow-hidden">
             <button 
               onClick={() => setShowStatusModal(false)}
-              className="absolute top-md right-md material-symbols-outlined text-outline hover:text-primary transition-colors cursor-pointer"
+              className="absolute top-sm right-sm sm:top-md sm:right-md material-symbols-outlined text-outline hover:text-primary transition-colors cursor-pointer"
             >
               close
             </button>
@@ -1084,7 +1170,7 @@ export default function App() {
               <h3 className="text-headline-sm font-bold text-on-surface">System Status Registry</h3>
             </div>
             
-            <div className="space-y-sm text-body-md text-on-surface-variant">
+            <div className="space-y-sm text-body-md text-on-surface-variant overflow-y-auto max-h-[60vh] custom-scrollbar pr-xs">
               <div className="flex justify-between items-center py-xs border-b border-outline-variant/10">
                 <span className="font-semibold text-on-surface">Backend Status:</span>
                 <span className="text-primary font-bold flex items-center gap-xs">
@@ -1128,7 +1214,7 @@ export default function App() {
 
             <button 
               onClick={() => setShowStatusModal(false)}
-              className="mt-sm w-full py-sm bg-primary text-on-primary font-bold rounded-xl active:scale-95 transition-transform"
+              className="mt-sm w-full py-sm bg-primary text-on-primary font-bold rounded-xl active:scale-95 transition-transform flex-none"
             >
               Close Status
             </button>
